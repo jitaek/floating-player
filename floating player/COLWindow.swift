@@ -12,8 +12,10 @@ class COLWindow: UIWindow {
 
     let playerContainerView = UIView()
     let playerVC = PlayerViewController()
-    
-    let hiddenFrame = CGRect(x: -UIScreen.main.bounds.width, y: UIScreen.main.bounds.height, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+
+//    let hiddenFrame = CGRect(x: -UIScreen.main.bounds.width, y: UIScreen.main.bounds.height, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+
+    let hiddenFrame = CGRect(x: -UIScreen.main.bounds.width, y: UIScreen.main.bounds.height - (UIScreen.main.bounds.width * 9 / 32) - 50, width: 100*16/9, height: 100)
     
     let minimizedFrame = CGRect(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height - (UIScreen.main.bounds.width * 9 / 32) - 50, width: 100*16/9, height: 100)
     
@@ -35,6 +37,7 @@ class COLWindow: UIWindow {
     
     func setupViews() {
         
+        NotificationCenter.default.addObserver(self, selector: #selector(playVideo), name: NSNotification.Name.playVideo, object: nil)
         playerVC.window = self
         playerContainerView.backgroundColor = .black
         
@@ -69,7 +72,35 @@ class COLWindow: UIWindow {
         }
     }
     
-    func playVideo() {
+    func handlePan(_ sender: UIPanGestureRecognizer, playerState: PlayerState) {
+        
+        switch playerState {
+            
+        case .hidden:
+            let translation = sender.translation(in: sender.view!)
+            
+            playerContainerView.center = CGPoint(x: playerContainerView.center.x + translation.x, y: playerContainerView.center.y)
+            sender.setTranslation(.zero, in: self)
+            
+        case .minimized:
+            let translation = sender.translation(in: sender.view!)
+            
+            playerContainerView.center = CGPoint(x: playerContainerView.center.x + translation.x, y: playerContainerView.center.y + translation.y)
+            sender.setTranslation(.zero, in: self)
+            
+        case .fullscreen:
+            let translation = sender.translation(in: sender.view!)
+            
+            playerContainerView.center = CGPoint(x: playerContainerView.center.x + translation.x, y: playerContainerView.center.y + translation.y)
+            sender.setTranslation(.zero, in: self)
+            
+        }
+
+    }
+    
+    @objc
+    func playVideo(_ notification: Notification) {
+        playerVC.playerState = .fullscreen
         playerContainerView.superview?.bringSubview(toFront: playerContainerView)
     }
 

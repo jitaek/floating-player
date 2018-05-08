@@ -12,7 +12,8 @@ class ViewController: UIViewController {
 
     @IBAction func playVideo(_ sender: Any) {
         
-        VideoLauncher.shared.playVideo()
+        NotificationCenter.default.post(name: Notification.Name.playVideo, object: nil)
+//        VideoLauncher.shared.playVideo()
     }
 
     override func viewDidLoad() {
