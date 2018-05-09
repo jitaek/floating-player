@@ -24,18 +24,18 @@ enum Direction {
 class PlayerViewController: UIViewController {
 
     weak var window: COLWindow?
-    var playerState = PlayerState.hidden {
+    var playerState = PlayerState.minimized {
         didSet {
 //            window?.animateToPlayerState(playerState)
             // TODO: Hide buttons depending on state.
-            switch playerState {
-            case .hidden:
-                UIApplication.shared.isStatusBarHidden = false
-            case .minimized:
-                UIApplication.shared.isStatusBarHidden = false
-            case .fullscreen:
-                UIApplication.shared.isStatusBarHidden = true
-            }
+//            switch playerState {
+//            case .hidden:
+//                UIApplication.shared.isStatusBarHidden = false
+//            case .minimized:
+//                UIApplication.shared.isStatusBarHidden = false
+//            case .fullscreen:
+//                UIApplication.shared.isStatusBarHidden = true
+//            }
         }
     }
     var direction = Direction.none
@@ -90,9 +90,8 @@ class PlayerViewController: UIViewController {
     @objc
     func handlePan(_ sender: UIPanGestureRecognizer) {
                 
-        switch sender.state {
+        if sender.state == .began {
             
-        case .began:
             // 1. User vertically swiping (min/max)
             // 2. User horizontally swiping (min/hidden)
             let velocity = sender.velocity(in: nil)
@@ -107,57 +106,63 @@ class PlayerViewController: UIViewController {
             } else {
                 self.direction = .horizontal
             }
+        }
             
-        case .changed:
-            
+//        case .changed:
+        
+        var endState = PlayerState.fullscreen
             switch playerState {
                 
             case .minimized:
                 
                 if self.direction == .horizontal {
-                    self.playerState = .hidden
-                    window?.handlePan(sender, playerState: playerState)
+                    endState = .hidden
+                    window?.handlePan(sender, playerState: endState)
                 }
                 else if self.direction == .up {
-                    self.playerState = .fullscreen
-                    window?.handlePan(sender, playerState: playerState)
+                    endState = .fullscreen
+                    window?.handlePan(sender, playerState: endState)
                 }
                 
             case .fullscreen:
                 
                 if self.direction == .down {
-                    self.playerState = .minimized
-                    window?.handlePan(sender, playerState: playerState)
+                    endState = .minimized
+                    window?.handlePan(sender, playerState: endState)
                 }
                 
             default:
                 break
             }
             
-        case .ended:
-            
-            switch playerState {
-                
-            case .minimized:
-                // check if user swiped more than halfway, then complete the animation
-                if self.direction == .horizontal || self.direction == .down {
-                    window?.animateToPlayerState(playerState)
-                }
-                
-            case .fullscreen:
-                
-                if self.direction == .up {
-                    window?.animateToPlayerState(playerState)
-                }
-                
-            default:
-                break
-            }
+        if sender.state == .ended {
 
-            
-        default:
-            break
+            window?.animateToPlayerState(endState)
+            // check if user dragged enough.
+//            self.playerState = endState
+//            switch playerState {
+//
+//            case .hidden:
+//                window?.animateToPlayerState(playerState)
+//
+//            case .minimized:
+//                // check if user swiped more than halfway, then complete the animation
+//                if self.direction == .horizontal || self.direction == .down {
+//                    window?.animateToPlayerState(playerState)
+//                }
+//
+//            case .fullscreen:
+//
+//                if self.direction == .up {
+//                    window?.animateToPlayerState(playerState)
+//                }
+//
+//            }
         }
+            
+//        default:
+//            break
+//        }
         
     }
     
@@ -166,7 +171,7 @@ class PlayerViewController: UIViewController {
         
         if playerState == .fullscreen {
             playerState = .minimized
-            window?.animateToPlayerState(playerState)
+            window?.playerContainerView.frame = window!.minimizedFrame
         }
         
     }

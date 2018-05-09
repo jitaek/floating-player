@@ -53,43 +53,75 @@ class COLWindow: UIWindow {
         
     }
     
+    /**
+     Only animate to final state if user has dragged enough
+     */
     func animateToPlayerState(_ playerState: PlayerState) {
         
-        let duration: TimeInterval = 1
+        let duration: TimeInterval = 0.5
         switch playerState {
         case .hidden:
-            UIView.animate(withDuration: duration) {
-                self.playerContainerView.frame = self.hiddenFrame
+            
+            if playerContainerView.frame.origin.x - hiddenFrame.origin.x < 400 {
+                UIView.animate(withDuration: duration) {
+                    self.playerContainerView.frame = self.hiddenFrame
+                }
             }
+            else {
+                // reset to previous
+                playerVC.playerState = .minimized
+                UIView.animate(withDuration: duration) {
+                    self.playerContainerView.frame = self.minimizedFrame
+                }
+            }
+
         case .minimized:
-            UIView.animate(withDuration: duration) {
-                self.playerContainerView.frame = self.minimizedFrame
+            if playerContainerView.frame.origin.y - minimizedFrame.origin.y < 300 {
+                UIView.animate(withDuration: duration) {
+                    self.playerContainerView.frame = self.minimizedFrame
+                }
             }
+            else {
+                playerVC.playerState = .fullscreen
+                UIView.animate(withDuration: duration) {
+                    self.playerContainerView.frame = self.fullScreenFrame
+                }
+            }
+
         case .fullscreen:
-            UIView.animate(withDuration: duration) {
-                self.playerContainerView.frame = self.fullScreenFrame
+            if playerContainerView.frame.origin.y - fullScreenFrame.origin.y < 300 {
+                UIView.animate(withDuration: duration) {
+                    self.playerContainerView.frame = self.fullScreenFrame
+                }
             }
+            else {
+                playerVC.playerState = .minimized
+                UIView.animate(withDuration: duration) {
+                    self.playerContainerView.frame = self.minimizedFrame
+                }
+            }
+
         }
     }
     
     func handlePan(_ sender: UIPanGestureRecognizer, playerState: PlayerState) {
         
+        let translation = sender.translation(in: sender.view!)
+//        print(translation.x)
+
         switch playerState {
             
         case .hidden:
-            let translation = sender.translation(in: sender.view!)
             
             playerContainerView.center = CGPoint(x: playerContainerView.center.x + translation.x, y: playerContainerView.center.y)
             sender.setTranslation(.zero, in: self)
             
         case .minimized:
-            let translation = sender.translation(in: sender.view!)
-            
-            playerContainerView.center = CGPoint(x: playerContainerView.center.x + translation.x, y: playerContainerView.center.y + translation.y)
+
+            playerContainerView.center = CGPoint(x: playerContainerView.center.x + translation.x, y: playerContainerView.center.y)
             sender.setTranslation(.zero, in: self)
             
         case .fullscreen:
-            let translation = sender.translation(in: sender.view!)
             
             playerContainerView.center = CGPoint(x: playerContainerView.center.x + translation.x, y: playerContainerView.center.y + translation.y)
             sender.setTranslation(.zero, in: self)
@@ -101,6 +133,10 @@ class COLWindow: UIWindow {
     @objc
     func playVideo(_ notification: Notification) {
         playerVC.playerState = .fullscreen
+        UIView.animate(withDuration: 0.5) {
+            self.playerContainerView.frame = self.fullScreenFrame
+        }
+//        animateToPlayerState(.fullscreen)
         playerContainerView.superview?.bringSubview(toFront: playerContainerView)
     }
 
