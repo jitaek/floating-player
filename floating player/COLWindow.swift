@@ -59,55 +59,34 @@ class COLWindow: UIWindow {
     func animateToPlayerState(_ playerState: PlayerState) {
         
         let duration: TimeInterval = 0.5
+        let finalFrame: CGRect
+        let dismissButtonHidden: Bool
+        
         switch playerState {
-        case .hidden:
             
-            if playerContainerView.frame.origin.x - hiddenFrame.origin.x < 400 {
-                UIView.animate(withDuration: duration) {
-                    self.playerContainerView.frame = self.hiddenFrame
-                }
-            }
-            else {
-                // reset to previous
-                playerVC.playerState = .minimized
-                UIView.animate(withDuration: duration) {
-                    self.playerContainerView.frame = self.minimizedFrame
-                }
-            }
+        case .hidden:
+            finalFrame = hiddenFrame
+            dismissButtonHidden = true
 
         case .minimized:
-            if playerContainerView.frame.origin.y - minimizedFrame.origin.y < 300 {
-                UIView.animate(withDuration: duration) {
-                    self.playerContainerView.frame = self.minimizedFrame
-                }
-            }
-            else {
-                playerVC.playerState = .fullscreen
-                UIView.animate(withDuration: duration) {
-                    self.playerContainerView.frame = self.fullScreenFrame
-                }
-            }
+            finalFrame = minimizedFrame
+            dismissButtonHidden = true
 
         case .fullscreen:
-            if playerContainerView.frame.origin.y - fullScreenFrame.origin.y < 300 {
-                UIView.animate(withDuration: duration) {
-                    self.playerContainerView.frame = self.fullScreenFrame
-                }
-            }
-            else {
-                playerVC.playerState = .minimized
-                UIView.animate(withDuration: duration) {
-                    self.playerContainerView.frame = self.minimizedFrame
-                }
-            }
+            finalFrame = fullScreenFrame
+            dismissButtonHidden = false
 
+        }
+        
+        UIView.animate(withDuration: duration) {
+            self.playerVC.dismissButton.isHidden = dismissButtonHidden
+            self.playerContainerView.frame = finalFrame
         }
     }
     
     func handlePan(_ sender: UIPanGestureRecognizer, playerState: PlayerState) {
         
         let translation = sender.translation(in: sender.view!)
-//        print(translation.x)
 
         switch playerState {
             
@@ -118,12 +97,13 @@ class COLWindow: UIWindow {
             
         case .minimized:
 
-            playerContainerView.center = CGPoint(x: playerContainerView.center.x + translation.x, y: playerContainerView.center.y)
+            playerContainerView.frame.origin = CGPoint(x: playerContainerView.frame.origin.x, y: max(0, playerContainerView.frame.origin.y + translation.y))
+            print(playerContainerView.center.y + translation.y)
             sender.setTranslation(.zero, in: self)
             
         case .fullscreen:
             
-            playerContainerView.center = CGPoint(x: playerContainerView.center.x + translation.x, y: playerContainerView.center.y + translation.y)
+            playerContainerView.center = CGPoint(x: playerContainerView.center.x, y: playerContainerView.center.y + translation.y)
             sender.setTranslation(.zero, in: self)
             
         }
