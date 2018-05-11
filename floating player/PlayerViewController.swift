@@ -30,14 +30,16 @@ class PlayerViewController: UIViewController, UIGestureRecognizerDelegate {
         didSet {
 //            playerFrameDelegate?.animateToPlayerState(playerState)
             // TODO: Hide buttons depending on state.
-//            switch playerState {
-//            case .hidden:
-//                UIApplication.shared.isStatusBarHidden = false
-//            case .minimized:
-//                UIApplication.shared.isStatusBarHidden = false
-//            case .fullscreen:
-//                UIApplication.shared.isStatusBarHidden = true
-//            }
+            switch playerState {
+            case .hidden:
+                UIApplication.shared.isStatusBarHidden = false
+            case .minimized:
+                UIApplication.shared.isStatusBarHidden = false
+                dismissButton.isHidden = true
+            case .fullscreen:
+                UIApplication.shared.isStatusBarHidden = true
+                dismissButton.isHidden = false
+            }
         }
     }
     var direction = Direction.none
@@ -70,9 +72,22 @@ class PlayerViewController: UIViewController, UIGestureRecognizerDelegate {
 
     let playerView = PlayerView()
     
+    func fullScreenVideo() {
+        
+        playerViewBottomConstraint?.isActive = true
+        UIView.animate(withDuration: 0.3) {
+            self.view.layoutIfNeeded()
+            
+        }
+        
+    }
+    
+    var playerViewBottomConstraint: NSLayoutConstraint?
+    
     func setupViews() {
         
-        view.backgroundColor = .blue
+        playerView.delegate = self
+        view.backgroundColor = .black
 
         view.addGestureRecognizer(tapGesture)
         view.addGestureRecognizer(panGesture)
@@ -82,11 +97,13 @@ class PlayerViewController: UIViewController, UIGestureRecognizerDelegate {
         view.addSubview(playerView)
         view.addSubview(dismissButton)
         
-        playerView.backgroundColor = .red
+        playerView.backgroundColor = .black
         
         playerView.anchor(top: view.topAnchor, leading: view.leadingAnchor, trailing: view.trailingAnchor, bottom: nil, topConstant: 0, leadingConstant: 0, trailingConstant: 0, bottomConstant: 0, widthConstant: 0, heightConstant: 0)
         let aspectRatioConstraint = NSLayoutConstraint(item: playerView, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: playerView, attribute: NSLayoutAttribute.height, multiplier: 16/9, constant: 0)
         playerView.addConstraint(aspectRatioConstraint)
+        playerViewBottomConstraint = playerView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        
         dismissButton.anchor(top: view.topAnchor, leading: view.leadingAnchor, trailing: nil, bottom: nil, topConstant: 10, leadingConstant: 10, trailingConstant: 0, bottomConstant: 0, widthConstant: 0, heightConstant: 50)
         
 
