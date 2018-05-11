@@ -18,6 +18,7 @@
 		04E8D358209FD562008112D6 /* VideoLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E8D357209FD562008112D6 /* VideoLauncher.swift */; };
 		04E8D35A20A018E0008112D6 /* COLWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E8D35920A018E0008112D6 /* COLWindow.swift */; };
 		101770A920A0C8DA002EBB12 /* Notification+Name.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101770A820A0C8DA002EBB12 /* Notification+Name.swift */; };
+		10258CFF20A545A90086242D /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10258CFE20A545A90086242D /* PlayerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 		04E8D357209FD562008112D6 /* VideoLauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoLauncher.swift; sourceTree = "<group>"; };
 		04E8D35920A018E0008112D6 /* COLWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = COLWindow.swift; sourceTree = "<group>"; };
 		101770A820A0C8DA002EBB12 /* Notification+Name.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notification+Name.swift"; sourceTree = "<group>"; };
+		10258CFE20A545A90086242D /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +75,7 @@
 				04E8D34F209FBB51008112D6 /* TabBarViewController.swift */,
 				04E8D355209FC067008112D6 /* UIView+Constraints.swift */,
 				04E8D353209FBED3008112D6 /* PlayerViewController.swift */,
+				10258CFE20A545A90086242D /* PlayerView.swift */,
 				04E8D357209FD562008112D6 /* VideoLauncher.swift */,
 				04E8D341209FBA14008112D6 /* Main.storyboard */,
 				04E8D344209FBA15008112D6 /* Assets.xcassets */,
@@ -153,6 +156,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				10258CFF20A545A90086242D /* PlayerView.swift in Sources */,
 				04E8D340209FBA14008112D6 /* ViewController.swift in Sources */,
 				04E8D35A20A018E0008112D6 /* COLWindow.swift in Sources */,
 				04E8D358209FD562008112D6 /* VideoLauncher.swift in Sources */,

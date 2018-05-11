@@ -13,8 +13,6 @@ class COLWindow: UIWindow {
     let playerContainerView = UIView()
     let playerVC = PlayerViewController()
 
-//    let hiddenFrame = CGRect(x: -UIScreen.main.bounds.width, y: UIScreen.main.bounds.height, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-
     let hiddenFrame = CGRect(x: -UIScreen.main.bounds.width, y: UIScreen.main.bounds.height - (UIScreen.main.bounds.width * 9 / 32) - 50, width: 100*16/9, height: 100)
     
     let minimizedFrame = CGRect(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height - (UIScreen.main.bounds.width * 9 / 32) - 50, width: 100*16/9, height: 100)
@@ -41,15 +39,15 @@ class COLWindow: UIWindow {
         playerVC.window = self
         playerContainerView.backgroundColor = .black
         
-        addSubview(playerContainerView)
-        
-        playerContainerView.frame = hiddenFrame
-        
-        playerContainerView.addSubview(playerVC.view)
-        playerVC.view.frame = playerContainerView.bounds
-        
-        self.playerContainerView.frame = minimizedFrame
-        self.playerVC.playerState = .minimized
+//        addSubview(playerContainerView)
+//        
+//        playerContainerView.frame = hiddenFrame
+//        
+//        playerContainerView.addSubview(playerVC.view)
+//        playerVC.view.frame = playerContainerView.bounds
+//        
+//        self.playerContainerView.frame = minimizedFrame
+//        self.playerVC.playerState = .minimized
         
     }
     

@@ -24,10 +24,11 @@ enum Direction {
 
 class PlayerViewController: UIViewController, UIGestureRecognizerDelegate {
 
+    weak var playerFrameDelegate: TabBarViewController?
     weak var window: COLWindow?
     var playerState = PlayerState.minimized {
         didSet {
-//            window?.animateToPlayerState(playerState)
+//            playerFrameDelegate?.animateToPlayerState(playerState)
             // TODO: Hide buttons depending on state.
 //            switch playerState {
 //            case .hidden:
@@ -62,50 +63,37 @@ class PlayerViewController: UIViewController, UIGestureRecognizerDelegate {
         setupViews()
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        playerLayer.frame = headerView.bounds
-    }
     
-//    override func viewDidAppear(_ animated: Bool) {
-//        super.viewDidAppear(animated)
-//
-//        let playerViewController = AVPlayerViewController()
-//        let player = AVPlayer(url: URL(string: "http://techslides.com/demos/sample-videos/small.mp4")!)
-//        playerViewController.player = player
-//
-//        present(playerViewController, animated: true) {
-//            player.play()
-//        }
-//
-//    }
-    let playerViewController = AVPlayerViewController()
-    let player = AVPlayer(url: URL(string: "http://techslides.com/demos/sample-videos/small.mp4")!)
-    lazy var playerLayer = AVPlayerLayer(player: player)
+//    let playerViewController = AVPlayerViewController()
+//    let player = AVPlayer(url: URL(string: "http://techslides.com/demos/sample-videos/small.mp4")!)
+//    lazy var playerLayer = AVPlayerLayer(player: player)
 
+    let playerView = PlayerView()
     
     func setupViews() {
         
         view.backgroundColor = .blue
-        headerView.backgroundColor = .red
+
         view.addGestureRecognizer(tapGesture)
         view.addGestureRecognizer(panGesture)
         tapGesture.delegate = self
         panGesture.delegate = self
         
-        view.addSubview(headerView)
+        view.addSubview(playerView)
         view.addSubview(dismissButton)
         
-        headerView.anchor(top: view.topAnchor, leading: view.leadingAnchor, trailing: view.trailingAnchor, bottom: nil, topConstant: 0, leadingConstant: 0, trailingConstant: 0, bottomConstant: 0, widthConstant: 0, heightConstant: 0)
-        let aspectRatioConstraint = NSLayoutConstraint(item: headerView, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: headerView, attribute: NSLayoutAttribute.height, multiplier: 16/9, constant: 0)
-        headerView.addConstraint(aspectRatioConstraint)
+        playerView.backgroundColor = .red
+        
+        playerView.anchor(top: view.topAnchor, leading: view.leadingAnchor, trailing: view.trailingAnchor, bottom: nil, topConstant: 0, leadingConstant: 0, trailingConstant: 0, bottomConstant: 0, widthConstant: 0, heightConstant: 0)
+        let aspectRatioConstraint = NSLayoutConstraint(item: playerView, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: playerView, attribute: NSLayoutAttribute.height, multiplier: 16/9, constant: 0)
+        playerView.addConstraint(aspectRatioConstraint)
         dismissButton.anchor(top: view.topAnchor, leading: view.leadingAnchor, trailing: nil, bottom: nil, topConstant: 10, leadingConstant: 10, trailingConstant: 0, bottomConstant: 0, widthConstant: 0, heightConstant: 50)
         
 
-        playerLayer.frame = headerView.bounds
-        headerView.layer.insertSublayer(playerLayer, at: 0)
-//        headerView.layer.addSublayer(playerLayer)
-        player.play()
+        
+//        playerLayer.frame = headerView.bounds
+//        headerView.layer.insertSublayer(playerLayer, at: 0)
+//        player.play()
         
 //        playerViewController.player = player
 //
@@ -114,15 +102,7 @@ class PlayerViewController: UIViewController, UIGestureRecognizerDelegate {
 //        headerView.addSubview(playerViewController.view)
 //        playerViewController.view.frame = headerView.bounds
 //        playerViewController.didMove(toParentViewController: self)
-        
-//        avplayerViewController.view.anchorEdgesToSuperview()
-//        avplayerViewController.didMove(toParentViewController: self)
 
-//        present(playerViewController, animated: true, completion: { finished in
-//            player.play()
-//        })
-        
-        
     }
     
     @objc
@@ -131,7 +111,7 @@ class PlayerViewController: UIViewController, UIGestureRecognizerDelegate {
         // Only handle case when player is minimized. This will make it fullscreen.
         if playerState == .minimized {
             playerState = .fullscreen
-            window?.animateToPlayerState(playerState)
+            playerFrameDelegate?.animateToPlayerState(playerState)
         }
     }
     
@@ -139,6 +119,7 @@ class PlayerViewController: UIViewController, UIGestureRecognizerDelegate {
     @objc
     func handlePan(_ sender: UIPanGestureRecognizer) {
 
+        guard let playerFrameDelegate = playerFrameDelegate else { return }
         let translation: CGFloat
         // Check player's current state.
         // Only track horizontal/vertical based on the current state.
@@ -184,14 +165,14 @@ class PlayerViewController: UIViewController, UIGestureRecognizerDelegate {
                 return
             case .minimized:
                 if self.direction == .horizontal {
-                    shouldCompleteTransition = abs(updatedFrame.origin.x - window!.minimizedFrame.origin.x) > 100
+                    shouldCompleteTransition = abs(updatedFrame.origin.x - playerFrameDelegate.minimizedFrame.origin.x) > 100
                 }
                 else {
-                    shouldCompleteTransition = (updatedFrame.origin.y - window!.fullScreenFrame.origin.y)/window!.minimizedFrame.origin.y < 0.5
+                    shouldCompleteTransition = (updatedFrame.origin.y - playerFrameDelegate.fullScreenFrame.origin.y)/playerFrameDelegate.minimizedFrame.origin.y < 0.5
                 }
 
             case .fullscreen:
-                shouldCompleteTransition = (updatedFrame.origin.y - window!.fullScreenFrame.origin.y)/window!.minimizedFrame.origin.y > 0.5
+                shouldCompleteTransition = (updatedFrame.origin.y - playerFrameDelegate.fullScreenFrame.origin.y)/playerFrameDelegate.minimizedFrame.origin.y > 0.5
             }
         }
         
@@ -202,18 +183,18 @@ class PlayerViewController: UIViewController, UIGestureRecognizerDelegate {
             
             if self.direction == .horizontal {
                 endState = .hidden
-                window?.handlePan(sender, playerState: endState)
+                playerFrameDelegate.handlePan(sender, playerState: endState)
             }
             else if self.direction == .up {
                 endState = .fullscreen
-                window?.handlePan(sender, playerState: endState)
+                playerFrameDelegate.handlePan(sender, playerState: endState)
             }
             
         case .fullscreen:
             
             if self.direction == .down {
                 endState = .minimized
-                window?.handlePan(sender, playerState: endState)
+                playerFrameDelegate.handlePan(sender, playerState: endState)
             }
             
         default:
@@ -223,10 +204,10 @@ class PlayerViewController: UIViewController, UIGestureRecognizerDelegate {
         if sender.state == .ended {
             if shouldCompleteTransition {
                 playerState = endState
-                window?.animateToPlayerState(endState)
+                playerFrameDelegate.animateToPlayerState(endState)
             }
             else {
-                window?.animateToPlayerState(playerState)
+                playerFrameDelegate.animateToPlayerState(playerState)
             }
         }
 
@@ -239,7 +220,7 @@ class PlayerViewController: UIViewController, UIGestureRecognizerDelegate {
         if playerState == .fullscreen {
             playerState = .minimized
             UIView.animate(withDuration: 0.5) {
-                self.window?.playerContainerView.frame = self.window!.minimizedFrame
+                self.playerFrameDelegate?.playerContainerView.frame = self.playerFrameDelegate!.minimizedFrame
             }
         }
         
